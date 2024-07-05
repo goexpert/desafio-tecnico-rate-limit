@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  rate-limit:
+    image: registry.gitlab.com/devopsrt71/container-images/golang.1.22-arm64
+    container_name: rate-limit
+    volumes:
+      - ./:/app
+    depends_on:
+      - redis
+    networks:
+      - rate-limit-network
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    networks:
+      - rate-limit-network
+
+  stress:
+    image: grafana/k6:latest
+    container_name: stress
+    entrypoint: /bin/sh
+    command: -c "sleep infinity"
+    volumes:
+      - ./stress:/app
+    networks:
+      - rate-limit-network
+
+networks:
+  rate-limit-network:
+    driver: bridge
