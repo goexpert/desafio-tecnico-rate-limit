@@ -2,14 +2,22 @@ package main
 
 import (
 	"fmt"
-	"github.com/goexpert/rate-limit/internal/server"
+	"net/http"
+	"time"
+
+	"github.com/goexpert/rate-limit/internal/usecase"
+	"github.com/goexpert/rate-limit/internal/web/handler"
+	"github.com/goexpert/rate-limit/internal/web/middleware"
 )
 
 func main() {
 
-	server := server.NewServer()
+	limiter := usecase.NewIpRateLimiter(10, time.Minute)
 
-	err := server.ListenAndServe()
+	mux := http.NewServeMux()
+	mux.HandleFunc("/hello", handler.HelloWorldHandler)
+
+	err := http.ListenAndServe(":8080", middleware.IpRateLimitMiddleware(mux, limiter))
 	if err != nil {
 		panic(fmt.Sprintf("cannot start server: %s", err))
 	}
