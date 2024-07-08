@@ -1,0 +1,6 @@
+{
+    "asciidoc.antora.enableAntoraSupport": true,
+    "golang.go": true,
+    "humao.rest-client": true,
+    "ms-vscode-remote.remote-containers": true
+}

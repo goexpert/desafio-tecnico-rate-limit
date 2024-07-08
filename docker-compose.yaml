@@ -4,6 +4,8 @@ services:
   rate-limit:
     image: registry.gitlab.com/devopsrt71/container-images/golang.1.22-arm64
     container_name: rate-limit
+    environment:
+      RATELIMIT: 10
     volumes:
       - ./:/app
     depends_on:
