@@ -5,18 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Main",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "cmd/api/main.go"
+        },
+        {
             "name": "Launch Package",
             "type": "go",
             "request": "launch",
             "mode": "auto",
             "program": "${fileDirname}"
         },
-        {
-            "name": "Main",
-            "type": "go",
-            "request": "launch",
-            "mode": "auto",
-            "program": "cmd/api/main.go"
-        }
     ]
 }

@@ -22,6 +22,11 @@ func main() {
 		panic("RATE LIMIT not defined or invalid")
 	}
 
+	interval, err := strconv.Atoi(os.Getenv("RATELIMIT_CLEANUP_INTERVAL"))
+	if err != nil {
+		panic("RATE LIMIT INTERVAL not defined or invalid")
+	}
+
 	ctx := context.Background()
 
 	client := redis.NewClient(&redis.Options{
@@ -32,7 +37,7 @@ func main() {
 
 	redisdb.Init(client, ctx)
 
-	limiter := usecase.NewIpRateLimiter(ctx, limit, time.Minute, client)
+	limiter := usecase.NewIpRateLimiter(ctx, limit, time.Second*time.Duration(interval), client)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/hello", handler.HelloWorldHandler)
