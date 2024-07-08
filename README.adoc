@@ -24,7 +24,7 @@ As configurações de limite do token de acesso devem se sobrepor as do IP. Ex: 
 * ✅ O sistema deve responder adequadamente quando o limite é excedido:
 ** ✅ Código HTTP: 429
 ** ✅ Mensagem: you have reached the maximum number of requests or actions allowed within a certain time frame
-* Todas as informações de "limiter” devem ser armazenadas e consultadas de um banco de dados Redis. Você pode utilizar docker-compose para subir o Redis.
+* ✅ Todas as informações de "limiter” devem ser armazenadas e consultadas de um banco de dados Redis. Você pode utilizar docker-compose para subir o Redis.
 * Crie uma “strategy” que permita trocar facilmente o Redis por outro mecanismo de persistência.
 * ✅ A lógica do limiter deve estar separada do middleware.
 
@@ -48,11 +48,4 @@ IMPORTANT: == Entrega:
 * O servidor web deve responder na porta 8080.
 
 
-:tip-caption: 💡
-
-[TIP]
-It's possible to use Unicode glyphs as admonition icons.
-
-
-símbolo de marca de seleção
-Unicode: U+2705, UTF-8: E2 9C 85
+include::README_SOLUTION.adoc[]

@@ -1,0 +1,11 @@
+== Solução Desafio Técnico -> Rate Limit
+
+=== Execução:
+
+execute o comando:
+
+[source, shell]
+----
+docker compose up -d -f docker-compose-prd.yaml
+----
+
