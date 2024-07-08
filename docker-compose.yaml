@@ -6,6 +6,7 @@ services:
     container_name: rate-limit
     environment:
       RATELIMIT: 10
+      RATELIMIT_CLEANUP_INTERVAL: 60
     volumes:
       - ./:/app
     depends_on:
@@ -21,9 +22,10 @@ services:
 
   stress:
     image: grafana/k6:latest
-    container_name: stress
     entrypoint: /bin/sh
     command: -c "sleep infinity"
+    deploy:
+      replicas: 3
     volumes:
       - ./stress:/app
     networks:

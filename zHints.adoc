@@ -1,0 +1,7 @@
+= hints
+
+[source, shell]
+----
+k6 run --vus 1 --duration 5s --iterations 13 --rps 100 - < k6-script.js
+----
+
