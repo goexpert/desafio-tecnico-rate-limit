@@ -17,7 +17,12 @@ func IpRateLimitMiddleware(next http.Handler, limiter *usecase.IpRateLimiter) ht
 			http.Error(w, "internal error", http.StatusInternalServerError)
 			return
 		}
-		if !limiter.Allow(ip) {
+		api_token := r.Header["Api_key"]
+		s_token := ""
+		if len(api_token) > 0 {
+			s_token = api_token[0]
+		}
+		if !limiter.Allow(ip, s_token) {
 			http.Error(w, "Rate limit exceeded", http.StatusTooManyRequests)
 			return
 		}

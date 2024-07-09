@@ -34,12 +34,12 @@ func NewIpRateLimiter(ctx context.Context, limit int, interval time.Duration, cl
 }
 
 // Allow checks if the request is allowed
-func (rl *IpRateLimiter) Allow(ip string) bool {
+func (rl *IpRateLimiter) Allow(ip, token string) bool {
 	rl.mu.Lock()
 	defer rl.mu.Unlock()
-	result, err := rl.client.Get(rl.ctx, ip).Result()
 	var ipRequests *database.IpRequests
-	json.Unmarshal([]byte(result), &ipRequests)
+
+	result, err := rl.client.Get(rl.ctx, ip).Result()
 
 	if err != nil {
 		json, _ := json.Marshal(database.NewRequest(ip, 1))
@@ -47,14 +47,22 @@ func (rl *IpRateLimiter) Allow(ip string) bool {
 		return true
 	}
 
-	//	requestsNow := rl.requests[ip]
+	json.Unmarshal([]byte(result), &ipRequests)
+
 	requestsNow := ipRequests.Qty
 
-	if requestsNow >= rl.limit {
+	if requestsNow > rl.limit && token == "" {
 		return false
 	}
 
-	//	rl.requests[ip]++
+	if requestsNow > rl.limit && token != "" {
+		var tokenResult database.TokenLimit
+		resultToken, _ := rl.client.Get(rl.ctx, token).Result()
+		json.Unmarshal([]byte(resultToken), &tokenResult)
+		if requestsNow > tokenResult.Limit {
+			return false
+		}
+	}
 
 	requestsNow++
 	json, _ := json.Marshal(database.NewRequest(ip, requestsNow))
