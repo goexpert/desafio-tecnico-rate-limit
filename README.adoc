@@ -19,8 +19,8 @@ As configurações de limite do token de acesso devem se sobrepor as do IP. Ex: 
 * ✅ O rate limiter deve poder trabalhar como um middleware que é injetado ao servidor web
 * ✅ O rate limiter deve permitir a configuração do número máximo de requisições permitidas por segundo.
 * O rate limiter deve ter ter a opção de escolher o tempo de bloqueio do IP ou do Token caso a quantidade de requisições tenha sido excedida.
-* As configurações de limite devem ser realizadas via variáveis de ambiente ou em um arquivo “.env” na pasta raiz.
-* Deve ser possível configurar o rate limiter tanto para limitação por IP quanto por token de acesso.
+* ✅ As configurações de limite devem ser realizadas via variáveis de ambiente ou em um arquivo “.env” na pasta raiz.
+* ✅ Deve ser possível configurar o rate limiter tanto para limitação por IP quanto por token de acesso.
 * ✅ O sistema deve responder adequadamente quando o limite é excedido:
 ** ✅ Código HTTP: 429
 ** ✅ Mensagem: you have reached the maximum number of requests or actions allowed within a certain time frame
@@ -30,8 +30,8 @@ As configurações de limite do token de acesso devem se sobrepor as do IP. Ex: 
 
 == Exemplos:
 
-* Limitação por IP: Suponha que o rate limiter esteja configurado para permitir no máximo 5 requisições por segundo por IP. Se o IP 192.168.1.1 enviar 6 requisições em um segundo, a sexta requisição deve ser bloqueada.
-* Limitação por Token: Se um token abc123 tiver um limite configurado de 10 requisições por segundo e enviar 11 requisições nesse intervalo, a décima primeira deve ser bloqueada.
+* ✅ Limitação por IP: Suponha que o rate limiter esteja configurado para permitir no máximo 5 requisições por segundo por IP. Se o IP 192.168.1.1 enviar 6 requisições em um segundo, a sexta requisição deve ser bloqueada.
+* ✅ Limitação por Token: Se um token abc123 tiver um limite configurado de 10 requisições por segundo e enviar 11 requisições nesse intervalo, a décima primeira deve ser bloqueada.
 
 Nos dois casos acima, as próximas requisições poderão ser realizadas somente quando o tempo total de expiração ocorrer. Ex: Se o tempo de expiração é de 5 minutos, determinado IP poderá realizar novas requisições somente após os 5 minutos.
 

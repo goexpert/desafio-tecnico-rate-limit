@@ -10,8 +10,8 @@ import (
 	"github.com/goexpert/rate-limit/internal/database"
 )
 
-// IpRateLimiter struct to hold rate limiting data
-type IpRateLimiter struct {
+// RateLimiter struct to hold rate limiting data
+type RateLimiter struct {
 	ctx      context.Context
 	requests map[string]int
 	mu       sync.Mutex
@@ -21,8 +21,8 @@ type IpRateLimiter struct {
 }
 
 // NewIpRateLimiter creates a new rate limiter
-func NewIpRateLimiter(ctx context.Context, limit int, interval time.Duration, client *redis.Client) *IpRateLimiter {
-	rl := &IpRateLimiter{
+func NewIpRateLimiter(ctx context.Context, limit int, interval time.Duration, client *redis.Client) *RateLimiter {
+	rl := &RateLimiter{
 		ctx:      ctx,
 		requests: make(map[string]int),
 		limit:    limit,
@@ -34,7 +34,7 @@ func NewIpRateLimiter(ctx context.Context, limit int, interval time.Duration, cl
 }
 
 // Allow checks if the request is allowed
-func (rl *IpRateLimiter) Allow(ip, token string) bool {
+func (rl *RateLimiter) Allow(ip, token string) bool {
 	rl.mu.Lock()
 	defer rl.mu.Unlock()
 	var ipRequests *database.IpRequests
@@ -71,7 +71,7 @@ func (rl *IpRateLimiter) Allow(ip, token string) bool {
 }
 
 // cleanup resets the rate limit counts at regular intervals
-func (rl *IpRateLimiter) cleanup() error {
+func (rl *RateLimiter) cleanup() error {
 	for {
 		rl.mu.Lock()
 		// for k := range rl.requests {

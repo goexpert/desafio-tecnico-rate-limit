@@ -8,7 +8,7 @@ import (
 )
 
 // rateLimitMiddleware applies rate limiting to incoming requests
-func IpRateLimitMiddleware(next http.Handler, limiter *usecase.IpRateLimiter) http.Handler {
+func RateLimitMiddleware(next http.Handler, limiter *usecase.RateLimiter) http.Handler {
 
 	result := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// ip := r.RemoteAddr

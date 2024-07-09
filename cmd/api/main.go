@@ -42,7 +42,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/hello", handler.HelloWorldHandler)
 
-	err = http.ListenAndServe(":8080", middleware.IpRateLimitMiddleware(mux, limiter))
+	err = http.ListenAndServe(":8080", middleware.RateLimitMiddleware(mux, limiter))
 	if err != nil {
 		panic(fmt.Sprintf("cannot start server: %s", err))
 	}

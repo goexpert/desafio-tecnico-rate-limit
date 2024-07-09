@@ -1,5 +1,14 @@
 == Solução Desafio Técnico -> Rate Limit
 
+=== Implementação
+
+Foi criado um middleware de limitação de requisições por IP e TOKEN.
+O middleware é responsável por verificar se o número de requisições por IP e TOKEN não ultrassou o limite estabelecido.
+Há duas variáveis de ambiente a serem configuradas:
+* RATELIMIT: quantidade de requisições permitidas por segundo.
+* RATELIMIT_CLEANUP_INTERVAL: intervalo de tempo de cleanup geral das requisições.
+
+
 === Execução:
 
 execute o comando:
