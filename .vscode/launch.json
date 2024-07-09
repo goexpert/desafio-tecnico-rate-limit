@@ -8,15 +8,19 @@
             "name": "Main",
             "type": "go",
             "request": "launch",
-            "mode": "auto",
-            "program": "cmd/api/main.go"
+            "mode": "debug",
+            "program": "cmd/api/main.go",
+            "env": {
+                "RATELIMIT": "10",
+                "RATELIMIT_CLEANUP_INTERVAL": "9000",
+            },
         },
         {
             "name": "Launch Package",
             "type": "go",
             "request": "launch",
-            "mode": "auto",
-            "program": "${fileDirname}"
+            "mode": "debug",
+            "program": "${fileDirname}",
         },
     ]
 }
