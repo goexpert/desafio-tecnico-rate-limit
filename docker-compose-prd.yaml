@@ -2,19 +2,21 @@ version: '3.8'
 
 services:
   app:
-    build: ./app
-    container_name: go_app
+    image: rogeriotadim/pos-go-expert:ratelimit
+    container_name: rate-limit
     depends_on:
       - redis
+    ports:
+      - 8080:8080
     networks:
-      - rate-limit-network
+      - rate-limit-network-prd
 
   redis:
     image: redis:latest
     container_name: redis
     networks:
-      - rate-limit-network
+      - rate-limit-network-prd
 
 networks:
-  rate-limit-network:
+  rate-limit-network-prd:
     driver: bridge
