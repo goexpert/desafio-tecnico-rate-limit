@@ -1,5 +1,7 @@
 = Desafio Técnico ->  Rate Limit
 
+include::README_SOLUTION.adoc[]
+
 == Objetivo:
 
 Desenvolver um rate limiter em Go que possa ser configurado para limitar o número máximo de requisições por segundo com base em um endereço IP específico ou em um token de acesso.
@@ -18,7 +20,7 @@ As configurações de limite do token de acesso devem se sobrepor as do IP. Ex: 
 
 * ✅ O rate limiter deve poder trabalhar como um middleware que é injetado ao servidor web
 * ✅ O rate limiter deve permitir a configuração do número máximo de requisições permitidas por segundo.
-* O rate limiter deve ter ter a opção de escolher o tempo de bloqueio do IP ou do Token caso a quantidade de requisições tenha sido excedida.
+* ✅ O rate limiter deve ter ter a opção de escolher o tempo de bloqueio do IP ou do Token caso a quantidade de requisições tenha sido excedida.
 * ✅ As configurações de limite devem ser realizadas via variáveis de ambiente ou em um arquivo “.env” na pasta raiz.
 * ✅ Deve ser possível configurar o rate limiter tanto para limitação por IP quanto por token de acesso.
 * ✅ O sistema deve responder adequadamente quando o limite é excedido:
@@ -46,6 +48,3 @@ IMPORTANT: == Entrega:
 * Testes automatizados demonstrando a eficácia e a robustez do rate limiter.
 * Utilize docker/docker-compose para que possamos realizar os testes de sua aplicação.
 * O servidor web deve responder na porta 8080.
-
-
-include::README_SOLUTION.adoc[]

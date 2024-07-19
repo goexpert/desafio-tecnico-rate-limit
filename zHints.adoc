@@ -3,5 +3,7 @@
 [source, shell]
 ----
 k6 run --vus 1 --duration 5s --iterations 13 --rps 100 - < k6-script.js
+
+qtd=50 ; vus=100 ; k6 run --vus $vus --duration $(($qtd + 10))s --iterations $(($qtd * $vus)) --rps $vus - < k6-script-token.js
 ----
 

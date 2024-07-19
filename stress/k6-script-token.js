@@ -5,7 +5,7 @@ export default function () {
     const URL = 'http://rate-limit:8080/hello';
     const PARAMS = {
         headers: {
-            'API_KEY': 'Token013'
+            'API_KEY': 'Token50'
         },
     };
     http.get(URL, PARAMS);

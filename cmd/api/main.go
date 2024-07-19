@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/goexpert/rate-limit/internal/database/redisdb"
+	"github.com/goexpert/rate-limit/internal/database"
 	"github.com/goexpert/rate-limit/internal/usecase"
 	"github.com/goexpert/rate-limit/internal/web/handler"
 	"github.com/goexpert/rate-limit/internal/web/middleware"
@@ -27,6 +27,13 @@ func main() {
 		panic("RATE LIMIT INTERVAL not defined or invalid")
 	}
 
+	blockInterval, err := strconv.Atoi(os.Getenv("RATELIMIT_CLEANUP_BLOCK_TIME"))
+	if err != nil {
+		panic("RATELIMIT CLEANUP BLOCK TIME not defined or invalid")
+	}
+
+	listTokens := database.NewTokenLimitList(os.Getenv("TOKEN_LIST"))
+
 	ctx := context.Background()
 
 	client := redis.NewClient(&redis.Options{
@@ -35,13 +42,14 @@ func main() {
 		DB:       0,
 	})
 
-	redisdb.Init(client, ctx)
+	// redisdb.Init(client, ctx)
 
-	limiter := usecase.NewIpRateLimiter(ctx, limit, time.Second*time.Duration(interval), client)
+	limiter := usecase.NewIpRateLimiter(ctx, limit, time.Millisecond*time.Duration(interval), time.Millisecond*time.Duration(blockInterval), listTokens, client)
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/hello", handler.HelloWorldHandler)
 
+	fmt.Println("starting on :8080")
 	err = http.ListenAndServe(":8080", middleware.RateLimitMiddleware(mux, limiter))
 	if err != nil {
 		panic(fmt.Sprintf("cannot start server: %s", err))

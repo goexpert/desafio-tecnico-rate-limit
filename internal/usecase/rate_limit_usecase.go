@@ -12,22 +12,26 @@ import (
 
 // RateLimiter struct to hold rate limiting data
 type RateLimiter struct {
-	ctx      context.Context
-	requests map[string]int
-	mu       sync.Mutex
-	limit    int
-	interval time.Duration
-	client   *redis.Client
+	ctx           context.Context
+	requests      map[string]int
+	mu            sync.Mutex
+	limit         int
+	interval      time.Duration
+	blockInterval time.Duration
+	listTokens    database.TokenLimitList
+	client        *redis.Client
 }
 
 // NewIpRateLimiter creates a new rate limiter
-func NewIpRateLimiter(ctx context.Context, limit int, interval time.Duration, client *redis.Client) *RateLimiter {
+func NewIpRateLimiter(ctx context.Context, limit int, interval time.Duration, blockInterval time.Duration, listTokens database.TokenLimitList, client *redis.Client) *RateLimiter {
 	rl := &RateLimiter{
-		ctx:      ctx,
-		requests: make(map[string]int),
-		limit:    limit,
-		interval: interval,
-		client:   client,
+		ctx:           ctx,
+		requests:      make(map[string]int),
+		limit:         limit,
+		interval:      interval,
+		blockInterval: blockInterval,
+		listTokens:    listTokens,
+		client:        client,
 	}
 	go rl.cleanup()
 	return rl
@@ -40,32 +44,52 @@ func (rl *RateLimiter) Allow(ip, token string) bool {
 	var ipRequests *database.IpRequests
 
 	result, err := rl.client.Get(rl.ctx, ip).Result()
-
 	if err != nil {
-		json, _ := json.Marshal(database.NewRequest(ip, 1))
+		json, _ := json.Marshal(database.NewRequest(ip, 1, 0))
 		rl.client.Set(rl.ctx, ip, json, 0)
 		return true
 	}
 
 	json.Unmarshal([]byte(result), &ipRequests)
-
-	requestsNow := ipRequests.Qty
-
-	if requestsNow > rl.limit && token == "" {
-		return false
-	}
-
-	if requestsNow > rl.limit && token != "" {
-		var tokenResult database.TokenLimit
-		resultToken, _ := rl.client.Get(rl.ctx, token).Result()
-		json.Unmarshal([]byte(resultToken), &tokenResult)
-		if requestsNow > tokenResult.Limit {
+	if ipRequests.BlockUntil > 0 {
+		// blockInterval, _ := strconv.Atoi(os.Getenv("RATELIMIT_CLEANUP_BLOCK_TIME"))
+		timeToRelase := time.Unix(ipRequests.BlockUntil, 0).
+			Add(rl.blockInterval)
+		if timeToRelase.After(time.Now()) {
 			return false
+		} else {
+			json, _ := json.Marshal(database.NewRequest(ip, 1, 0))
+			rl.client.Set(rl.ctx, ip, json, 0)
+			return true
 		}
 	}
 
+	requestsNow := ipRequests.Qty
+
+	if token != "" && rl.listTokens.GetLimit(token) > 0 {
+		tokenLimit := rl.listTokens.GetLimit(token)
+		// resultToken, _ := rl.client.Get(rl.ctx, token).Result()
+		// json.Unmarshal([]byte(resultToken), &tokenLimit)
+		if requestsNow >= tokenLimit {
+			json, _ := json.Marshal(database.NewRequest(ip, 0, time.Now().Unix()))
+			rl.client.Set(rl.ctx, ip, json, 0)
+			return false
+		} else {
+			requestsNow++
+			json, _ := json.Marshal(database.NewRequest(ip, requestsNow, 0))
+			rl.client.Set(rl.ctx, ip, json, 0)
+			return true
+		}
+	}
+
+	if requestsNow >= rl.limit {
+		json, _ := json.Marshal(database.NewRequest(ip, 0, time.Now().Unix()))
+		rl.client.Set(rl.ctx, ip, json, 0)
+		return false
+	}
+
 	requestsNow++
-	json, _ := json.Marshal(database.NewRequest(ip, requestsNow))
+	json, _ := json.Marshal(database.NewRequest(ip, requestsNow, 0))
 	rl.client.Set(rl.ctx, ip, json, 0)
 	return true
 }

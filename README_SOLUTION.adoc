@@ -5,9 +5,34 @@
 Foi criado um middleware de limitação de requisições por IP e TOKEN.
 O middleware é responsável por verificar se o número de requisições por IP e TOKEN não ultrassou o limite estabelecido.
 Há duas variáveis de ambiente a serem configuradas:
-* RATELIMIT: quantidade de requisições permitidas por segundo.
-* RATELIMIT_CLEANUP_INTERVAL: intervalo de tempo de cleanup geral das requisições.
 
+* RATELIMIT: quantidade de requisições permitidas por segundo.
+
+* RATELIMIT_CLEANUP_INTERVAL: intervalo de tempo em milissegundos de cleanup geral das requisições (Padrão de 1000 milissegundos).
+
+* RATELIMIT_CLEANUP_BLOCK_TIME: tempo de bloqueio após um IP ter excedido o limite
+
+* TOKEN_LIST: lista de limites de requisições por token. Cada item da lista corresponde a quantidade de requisições por RATELIMIT_CLEANUP_INTERVAL do token
+
+Exemplo de configuração das variáveis de ambiente:
+
+[source, shell]
+----
+RATELIMIT=10
+RATELIMIT_CLEANUP_INTERVAL=1000
+RATELIMIT_CLEANUP_BLOCK_TIME=30000
+TOKEN_LIST=20,50,100,200,500
+----
+
+Com esta configuração o rate-limit:
+
+- bloqueará o IP após 10 requisições;
+
+- fará a limpeza dos registros das requisições a cada 1000 milissegundos;
+
+- manterá o IP bloqueado por 30000 milissegundos; e
+
+- permitirá 20 requisições por RATELIMIT_CLEANUP_INTERVAL para o token *Token20*, 50 para o token *Token50* e assim por diante 
 
 === Execução:
 
