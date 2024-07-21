@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -49,9 +49,8 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/hello", handler.HelloWorldHandler)
 
-	fmt.Println("starting on :8080")
-	err = http.ListenAndServe(":8080", middleware.RateLimitMiddleware(mux, limiter))
-	if err != nil {
-		panic(fmt.Sprintf("cannot start server: %s", err))
+	log.Println(":8080 started")
+	if err = http.ListenAndServe(":8080", middleware.RateLimitMiddleware(mux, limiter)); err != nil {
+		log.Fatalf("Server failed: %s", err)
 	}
 }
