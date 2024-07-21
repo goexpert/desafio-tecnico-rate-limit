@@ -32,7 +32,7 @@ func main() {
 		panic("RATELIMIT CLEANUP BLOCK TIME not defined or invalid")
 	}
 
-	listTokens := database.NewTokenLimitList(os.Getenv("TOKEN_LIST"))
+	listTokens := database.NewTokenLimitList(os.Getenv("RATELIMIT_TOKEN_LIST"))
 
 	ctx := context.Background()
 
