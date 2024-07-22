@@ -27,7 +27,7 @@ As configurações de limite do token de acesso devem se sobrepor as do IP. Ex: 
 ** ✅ Código HTTP: 429
 ** ✅ Mensagem: you have reached the maximum number of requests or actions allowed within a certain time frame
 * ✅ Todas as informações de "limiter” devem ser armazenadas e consultadas de um banco de dados Redis. Você pode utilizar docker-compose para subir o Redis.
-* Crie uma “strategy” que permita trocar facilmente o Redis por outro mecanismo de persistência.
+* ✅ Crie uma “strategy” que permita trocar facilmente o Redis por outro mecanismo de persistência.
 * ✅ A lógica do limiter deve estar separada do middleware.
 
 == Exemplos:

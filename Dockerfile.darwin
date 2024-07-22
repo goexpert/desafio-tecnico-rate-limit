@@ -1,11 +1,11 @@
-FROM golang:1.22.5-bullseye AS builder
+FROM golang:1.22.5 AS builder
 WORKDIR /app
 COPY . .
 #RUN GOOS=darwin CGO_ENABLED=0 go build -ldflags="-w -s" -o rate-limit cmd/api/main.go
-RUN GOOS=darwin CGO_ENABLED=0 go build -o rate-limit cmd/api/main.go
+RUN go mod tidy
+RUN GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -o rate-limit cmd/api/main.go
 
 FROM scratch
-COPY --from=builder /app/rate-limit .
 EXPOSE 8080
-
+COPY --from=builder /app/rate-limit .
 CMD ["./rate-limit"]

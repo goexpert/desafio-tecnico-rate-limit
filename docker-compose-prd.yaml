@@ -1,17 +1,23 @@
 version: '3.8'
 
 services:
-  app:
-    image: rogeriotadim/pos-go-expert:ratelimit
-    container_name: rate-limit
+  rate-limit-prd:
+    image: rogeriotadim/pos-go-expert:ratelimit-arm64
+    container_name: rate-limit-prd
+    environment:
+      RATELIMIT: 10
+      RATELIMIT_CLEANUP_INTERVAL: 9000000
+      RATELIMIT_CLEANUP_BLOCK_TIME: 30000
+      RATELIMIT_TOKEN_LIST: 20,50,100,200,500
+      RATELIMIT_REDIS_HOST: redis-prd
     depends_on:
-      - redis
+      - redis-prd
     ports:
       - 8080:8080
     networks:
       - rate-limit-network-prd
 
-  redis:
+  redis-prd:
     image: redis:latest
     container_name: redis
     networks:
