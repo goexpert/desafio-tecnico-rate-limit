@@ -3,10 +3,10 @@ package usecase
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"sync"
 	"time"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/goexpert/rate-limit/internal/database"
 )
 
@@ -19,11 +19,11 @@ type RateLimiter struct {
 	interval      time.Duration
 	blockInterval time.Duration
 	listTokens    database.TokenLimitList
-	client        *redis.Client
+	client        database.Persist
 }
 
 // NewIpRateLimiter creates a new rate limiter
-func NewIpRateLimiter(ctx context.Context, limit int, interval time.Duration, blockInterval time.Duration, listTokens database.TokenLimitList, client *redis.Client) *RateLimiter {
+func NewIpRateLimiter(ctx context.Context, limit int, interval time.Duration, blockInterval time.Duration, listTokens database.TokenLimitList, client database.Persist) *RateLimiter {
 	rl := &RateLimiter{
 		ctx:           ctx,
 		requests:      make(map[string]int),
@@ -41,12 +41,13 @@ func NewIpRateLimiter(ctx context.Context, limit int, interval time.Duration, bl
 func (rl *RateLimiter) Allow(ip, token string) bool {
 	rl.mu.Lock()
 	defer rl.mu.Unlock()
-	var ipRequests *database.IpRequests
+	var ipRequests database.IpRequests
 
-	result, err := rl.client.Get(rl.ctx, ip).Result()
+	result, err := rl.client.Get(rl.ctx, ip)
 	if err != nil {
+		log.Println("first req")
 		json, _ := json.Marshal(database.NewRequest(ip, 1, 0))
-		rl.client.Set(rl.ctx, ip, json, 0)
+		rl.client.Set(rl.ctx, ip, json)
 		return true
 	}
 
@@ -59,7 +60,7 @@ func (rl *RateLimiter) Allow(ip, token string) bool {
 			return false
 		} else {
 			json, _ := json.Marshal(database.NewRequest(ip, 1, 0))
-			rl.client.Set(rl.ctx, ip, json, 0)
+			rl.client.Set(rl.ctx, ip, json)
 			return true
 		}
 	}
@@ -72,25 +73,25 @@ func (rl *RateLimiter) Allow(ip, token string) bool {
 		// json.Unmarshal([]byte(resultToken), &tokenLimit)
 		if requestsNow >= tokenLimit {
 			json, _ := json.Marshal(database.NewRequest(ip, 0, time.Now().Unix()))
-			rl.client.Set(rl.ctx, ip, json, 0)
+			rl.client.Set(rl.ctx, ip, json)
 			return false
 		} else {
 			requestsNow++
 			json, _ := json.Marshal(database.NewRequest(ip, requestsNow, 0))
-			rl.client.Set(rl.ctx, ip, json, 0)
+			rl.client.Set(rl.ctx, ip, json)
 			return true
 		}
 	}
 
 	if requestsNow >= rl.limit {
 		json, _ := json.Marshal(database.NewRequest(ip, 0, time.Now().Unix()))
-		rl.client.Set(rl.ctx, ip, json, 0)
+		rl.client.Set(rl.ctx, ip, json)
 		return false
 	}
 
 	requestsNow++
 	json, _ := json.Marshal(database.NewRequest(ip, requestsNow, 0))
-	rl.client.Set(rl.ctx, ip, json, 0)
+	rl.client.Set(rl.ctx, ip, json)
 	return true
 }
 
@@ -104,13 +105,14 @@ func (rl *RateLimiter) cleanup() error {
 		pattern := "*.*.*.*"
 		// cursor := uint64(0)
 
-		lista, err := rl.client.Keys(rl.ctx, pattern).Result()
+		lista, err := rl.client.Keys(rl.ctx, pattern)
 		if err != nil {
+			log.Panicln(err.Error())
 			return err
 		}
 		if len(lista) > 0 {
 			for _, key := range lista {
-				_, err = rl.client.Del(rl.ctx, key).Result()
+				_, err = rl.client.Del(rl.ctx, key)
 				if err != nil {
 					return err
 				}
