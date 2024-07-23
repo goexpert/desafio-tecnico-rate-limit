@@ -33,10 +33,15 @@ func main() {
 
 	listTokens := database.NewTokenLimitList(os.Getenv("RATELIMIT_TOKEN_LIST"))
 
+	redis_url := os.Getenv("RATELIMIT_REDIS_URL")
+	if redis_url == "" {
+		panic("RATELIMIT_REDIS_URL not defined or invalid")
+	}
+
 	ctx := context.Background()
 
 	options := make(map[string]string)
-	options["addr"] = "redis:6379"
+	options["addr"] = redis_url
 	options["password"] = ""
 	options["db"] = "0"
 
