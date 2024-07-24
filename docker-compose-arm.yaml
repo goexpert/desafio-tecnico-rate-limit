@@ -29,7 +29,7 @@ services:
     environment:
       RATELIMIT_HOST_TARGET: rate-limit-arm64
       RATELIMIT_PORT_TARGET: 8080
-    command: run --vus 1 --duration 60s --rps 15 /app/k6-script.js
+    command: run --vus 1 --duration 60s --rps 25 /app/k6-script.js
     depends_on:
       - rate-limit-arm64
     volumes:
@@ -43,8 +43,8 @@ services:
     environment:
       RATELIMIT_HOST_TARGET: rate-limit-arm64
       RATELIMIT_PORT_TARGET: 8080
-      RATELIMIT_TOKEN_LIMIT_TARGET: 50
-    command: run --vus 1 --duration 60s --rps 75 /app/k6-script-token.js
+      RATELIMIT_TOKEN_LIMIT_TARGET: 20
+    command: run --vus 1 --duration 60s --rps 25 /app/k6-script-token.js
     depends_on:
       - rate-limit-arm64
     volumes:

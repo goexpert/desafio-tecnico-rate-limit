@@ -4,13 +4,16 @@
 
 Foi criado um middleware de limitação de requisições por IP e TOKEN.
 O middleware é responsável por verificar se o número de requisições por IP e TOKEN não ultrassou o limite estabelecido.
-Há duas variáveis de ambiente a serem configuradas:
+A camada de persistência da solução foi implementada através de uma interface que permite facilmente substituir o Redis por outra ferramenta de persistência.
+
+
+As variáveis de ambiente a serem configuradas para definir o funcionamento da solução são:
 
 * RATELIMIT: quantidade de requisições permitidas por segundo.
 
 * RATELIMIT_CLEANUP_INTERVAL: intervalo de tempo em milissegundos de cleanup geral das requisições (Padrão de 1000 milissegundos).
 
-* RATELIMIT_CLEANUP_BLOCK_TIME: tempo de bloqueio após um IP ter excedido o limite
+* RATELIMIT_BLOCK_TIME: tempo de bloqueio após um IP ter excedido o limite
 
 * TOKEN_LIST: lista de limites de requisições por token. Cada item da lista corresponde a quantidade de requisições por RATELIMIT_CLEANUP_INTERVAL do token
 
@@ -20,7 +23,7 @@ Exemplo de configuração das variáveis de ambiente:
 ----
 RATELIMIT=10
 RATELIMIT_CLEANUP_INTERVAL=1000
-RATELIMIT_CLEANUP_BLOCK_TIME=30000
+RATELIMIT_BLOCK_TIME=30000
 TOKEN_LIST=20,50,100,200,500
 ----
 
@@ -34,12 +37,20 @@ Com esta configuração o rate-limit:
 
 - permitirá 20 requisições por RATELIMIT_CLEANUP_INTERVAL para o token *Token20*, 50 para o token *Token50* e assim por diante 
 
-=== Execução:
+=== Validação da solução:
 
-execute o comando:
+Para a execução da solução é necessário fazer o clone do repo e em seguida disparar a aplicação com o comando:
 
 [source, shell]
 ----
-docker compose up -d -f docker-compose-prd.yaml
+docker compose up
 ----
+
+Então serão levantados quatro containers sendo um da aplicação, um da camada de persistência (Redis) e dois containers contendo a execução do teste de stress.
+
+Os testes foram configurados para durarem 60 segundos com uma taxa de 25 requisições por segundo. Após este tempo serão criados na pasta `stress` dois arquivos sendo:
+
+* summary-ip, contendo o resultado do teste de requições sem token; e
+
+* summary-token, contendo o resultado do teste de requisições com *Token20*.
 
