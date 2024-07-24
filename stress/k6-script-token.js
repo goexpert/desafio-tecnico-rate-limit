@@ -16,6 +16,6 @@ export default function () {
 
 export function handleSummary(data) {
     return {
-        "/app/summary-token.html": htmlReport(data),
+        "/home/k6/stress/summary-token.html": htmlReport(data),
     };
 }

@@ -9,6 +9,6 @@ export default function () {
 
 export function handleSummary(data) {
     return {
-        "/app/summary-ip.html": htmlReport(data),
+        "/home/k6/stress/summary-ip.html": htmlReport(data),
     };
 }

@@ -24,34 +24,37 @@ services:
       - rate-limit-network-prd
 
   stress-ip:
+    user: "1000"
     image: grafana/k6:latest
     container_name: stress-ip
     environment:
       RATELIMIT_HOST_TARGET: rate-limit-prd
       RATELIMIT_PORT_TARGET: 8080
-    command: run --vus 1 --duration 60s --rps 25 /app/k6-script.js
+    command: run -q --vus 1 --duration 60s --rps 25 /home/k6/stress/k6-script.js
     depends_on:
       - rate-limit-prd
     volumes:
-      - ./stress:/app
+      - ./stress:/home/k6/stress
     networks:
       - rate-limit-network-prd
 
   stress-token:
+    user: "1000"
     image: grafana/k6:latest
     container_name: stress-token
     environment:
       RATELIMIT_HOST_TARGET: rate-limit-prd
       RATELIMIT_PORT_TARGET: 8080
       RATELIMIT_TOKEN_LIMIT_TARGET: 20
-    command: run --vus 1 --duration 60s --rps 25 /app/k6-script-token.js
+    command: run -q --vus 1 --duration 60s --rps 25 /home/k6/stress/k6-script-token.js
     depends_on:
       - rate-limit-prd
     volumes:
-      - ./stress:/app
+      - ./stress:/home/k6/stress
     networks:
       - rate-limit-network-prd
 
 networks:
   rate-limit-network-prd:
     driver: bridge
+
