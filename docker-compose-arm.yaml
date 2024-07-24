@@ -1,57 +1,57 @@
 # version: '3.8'
 
 services:
-  rate-limit-prd:
-    image: rogeriotadim/pos-go-expert:ratelimit
-    container_name: rate-limit-prd
+  rate-limit-arm64:
+    image: rogeriotadim/pos-go-expert:ratelimit-arm64
+    container_name: rate-limit-arm64
     environment:
       RATELIMIT: 10
       RATELIMIT_CLEANUP_INTERVAL: 1000
       RATELIMIT_BLOCK_TIME: 30000
       RATELIMIT_TOKEN_LIST: 20,50,100,200,500
-      RATELIMIT_REDIS_URL: redis-prd:6379
+      RATELIMIT_REDIS_URL: redis-arm64:6379
     depends_on:
-      - redis-prd
+      - redis-arm64
     ports:
       - 8080:8080
     networks:
-      - rate-limit-network-prd
+      - rate-limit-network-arm64
 
-  redis-prd:
+  redis-arm64:
     image: redis:latest
-    container_name: redis-prd
+    container_name: redis-arm64
     networks:
-      - rate-limit-network-prd
+      - rate-limit-network-arm64
 
   stress-ip:
     image: grafana/k6:latest
     container_name: stress-ip
     environment:
-      RATELIMIT_HOST_TARGET: rate-limit-prd
+      RATELIMIT_HOST_TARGET: rate-limit-arm64
       RATELIMIT_PORT_TARGET: 8080
     command: run --vus 1 --duration 60s --rps 15 /app/k6-script.js
     depends_on:
-      - rate-limit-prd
+      - rate-limit-arm64
     volumes:
       - ./stress:/app
     networks:
-      - rate-limit-network-prd
+      - rate-limit-network-arm64
 
   stress-token:
     image: grafana/k6:latest
     container_name: stress-token
     environment:
-      RATELIMIT_HOST_TARGET: rate-limit-prd
+      RATELIMIT_HOST_TARGET: rate-limit-arm64
       RATELIMIT_PORT_TARGET: 8080
       RATELIMIT_TOKEN_LIMIT_TARGET: 50
     command: run --vus 1 --duration 60s --rps 75 /app/k6-script-token.js
     depends_on:
-      - rate-limit-prd
+      - rate-limit-arm64
     volumes:
       - ./stress:/app
     networks:
-      - rate-limit-network-prd
+      - rate-limit-network-arm64
 
 networks:
-  rate-limit-network-prd:
+  rate-limit-network-arm64:
     driver: bridge

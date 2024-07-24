@@ -26,9 +26,9 @@ func main() {
 		panic("RATE LIMIT INTERVAL not defined or invalid")
 	}
 
-	blockInterval, err := strconv.Atoi(os.Getenv("RATELIMIT_CLEANUP_BLOCK_TIME"))
+	blockInterval, err := strconv.Atoi(os.Getenv("RATELIMIT_BLOCK_TIME"))
 	if err != nil {
-		panic("RATELIMIT CLEANUP BLOCK TIME not defined or invalid")
+		panic("RATELIMIT BLOCK TIME not defined or invalid")
 	}
 
 	listTokens := database.NewTokenLimitList(os.Getenv("RATELIMIT_TOKEN_LIST"))

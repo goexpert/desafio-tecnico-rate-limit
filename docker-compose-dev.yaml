@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  rate-limit:
+    image: registry.gitlab.com/devopsrt71/container-images/golang.1.22-arm64
+    container_name: rate-limit
+    environment:
+      RATELIMIT: 10
+      RATELIMIT_CLEANUP_INTERVAL: 1000
+      RATELIMIT_BLOCK_TIME: 30000
+      TOKEN_LIST: 20,50,100,200,500
+    volumes:
+      - ./:/app
+    ports:
+      - 8888:8080
+    depends_on:
+      - redis
+    networks:
+      - rate-limit-network
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    networks:
+      - rate-limit-network
+
+  stress:
+    image: grafana/k6:latest
+    entrypoint: /bin/sh
+    command: -c "sleep infinity"
+    deploy:
+      replicas: 3
+    volumes:
+      - ./stress:/app
+    networks:
+      - rate-limit-network
+
+networks:
+  rate-limit-network:
+    driver: bridge

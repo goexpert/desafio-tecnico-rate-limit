@@ -7,7 +7,7 @@ import (
 )
 
 func HelloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("hello <-")
+	// log.Println("hello <-")
 	resp := make(map[string]string)
 	resp["message"] = "Hello World"
 

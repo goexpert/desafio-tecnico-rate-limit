@@ -45,7 +45,7 @@ func (rl *RateLimiter) Allow(ip, token string) bool {
 
 	result, err := rl.client.Get(rl.ctx, ip)
 	if err != nil {
-		log.Println("first req")
+		// log.Println("first req")
 		json, _ := json.Marshal(database.NewRequest(ip, 1, 0))
 		rl.client.Set(rl.ctx, ip, json)
 		return true
@@ -53,7 +53,6 @@ func (rl *RateLimiter) Allow(ip, token string) bool {
 
 	json.Unmarshal([]byte(result), &ipRequests)
 	if ipRequests.BlockUntil > 0 {
-		// blockInterval, _ := strconv.Atoi(os.Getenv("RATELIMIT_CLEANUP_BLOCK_TIME"))
 		timeToRelase := time.Unix(ipRequests.BlockUntil, 0).
 			Add(rl.blockInterval)
 		if timeToRelase.After(time.Now()) {
